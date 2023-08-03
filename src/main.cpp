@@ -75,7 +75,6 @@ int main() {
     int vertexColorLocation = glGetUniformLocation(shader.ID, "ourColor");
 
     shader.use();
-    shader.setFloat("offset", 0.7);
     glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     
