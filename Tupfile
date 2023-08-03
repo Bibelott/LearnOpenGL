@@ -1,0 +1,4 @@
+include_rules
+LIBS = -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lm
+
+: src/*.o lib/*.a |> $(CXX) $(LIBS) %f -o %o |> gltut

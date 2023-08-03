@@ -1,0 +1,10 @@
+CC=clang
+CXX=clang++
+
+CFLAGS += -Wall
+CXXFLAGS = $(CFLAGS)
+
+!cc = |> $(CC) $(CFLAGS) -c %f -o %o |> %B.o
+!cxx = |> $(CXX) $(CXXFLAGS) -c %f -o %o |> %B.o
+
+.gitignore

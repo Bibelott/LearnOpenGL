@@ -1,0 +1,7 @@
+include_rules
+CFLAGS += -I../include
+CXXFLAGS += -I../include
+: foreach *.c |> !cc |>
+: foreach *.cpp |> !cxx |>
+
+.gitignore
