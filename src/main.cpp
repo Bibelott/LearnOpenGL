@@ -7,6 +7,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+float g_MixValue = 0.2f;
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 void processInput(GLFWwindow* window);
@@ -43,10 +45,10 @@ int main() {
 
   float vertices[] = {
     // positions        // colors         // texture coords
-     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.6f, 0.6f, // top right
-     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.6f, 0.4f, // bottom right
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.4f, 0.4f, // bottom left
-    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.4f, 0.6f  // top left
+     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
   };
   unsigned int indices[] {
     0, 1, 3,
@@ -85,8 +87,8 @@ int main() {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture[0]);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   {
     int width, height, nrChannels;
@@ -106,8 +108,8 @@ int main() {
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, texture[1]);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   {
     int width, height, nrChannels;
@@ -136,6 +138,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // shader.use();
+    shader.setFloat("mixValue", g_MixValue);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     
     // end loop
@@ -158,4 +161,16 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
+
+  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    g_MixValue += 0.005f;
+    if (g_MixValue > 1.0f)
+      g_MixValue = 1.0f;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    g_MixValue -= 0.005f;
+    if (g_MixValue < 0.0f)
+      g_MixValue = 0.0f;
+  }
 }
