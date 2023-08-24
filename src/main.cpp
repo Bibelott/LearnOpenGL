@@ -77,25 +77,56 @@ int main() {
 
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
+  stbi_set_flip_vertically_on_load(true);
+
+  unsigned int texture[2];
+  glGenTextures(2, texture);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture[0]);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  int width, height, nrChannels;
-  unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+  {
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("textures/container.jpg", &width, &height, &nrChannels, 0);
 
-  if (data) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  }
-  else {
-    std::cerr << "Failed to load texture\n";
+    if (data) {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+      glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+      std::cerr << "Failed to load texture\n";
+    }
+
+    stbi_image_free(data);
   }
 
-  stbi_image_free(data);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, texture[1]);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  {
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("textures/awesomeface.png", &width, &height, &nrChannels, 0);
+
+    if (data) {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+      glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+      std::cerr << "Failed to load texture\n";
+    }
+
+    stbi_image_free(data);
+  }
+  
+  shader.use();
+  shader.setInt("texture1", 0);
+  shader.setInt("texture2", 1);
   
   // render loop
   while(!glfwWindowShouldClose(window)) {
@@ -104,7 +135,7 @@ int main() {
     // render
     glClear(GL_COLOR_BUFFER_BIT);
 
-    shader.use();
+    // shader.use();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     
     // end loop
