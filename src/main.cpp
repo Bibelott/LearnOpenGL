@@ -3,11 +3,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <shader.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
-float g_MixValue = 0.2f;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -129,6 +130,8 @@ int main() {
   shader.use();
   shader.setInt("texture1", 0);
   shader.setInt("texture2", 1);
+
+  unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
   
   // render loop
   while(!glfwWindowShouldClose(window)) {
@@ -137,8 +140,13 @@ int main() {
     // render
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
     // shader.use();
-    shader.setFloat("mixValue", g_MixValue);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     
     // end loop
@@ -161,16 +169,4 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
-
-  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-    g_MixValue += 0.005f;
-    if (g_MixValue > 1.0f)
-      g_MixValue = 1.0f;
-  }
-
-  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-    g_MixValue -= 0.005f;
-    if (g_MixValue < 0.0f)
-      g_MixValue = 0.0f;
-  }
 }
