@@ -139,12 +139,20 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
     trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
     shader.setMat4("transform", trans);
 
     // shader.use();
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    glm::mat4 trans1 = glm::mat4(1.0f);
+    trans1 = glm::translate(trans1, glm::vec3(-0.5f, 0.5f, 0.0f));
+    trans1 = glm::scale(trans1, glm::vec3(glm::abs(glm::sin(glfwGetTime()))));
+    
+    shader.setMat4("transform", trans1);
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     
     // end loop
