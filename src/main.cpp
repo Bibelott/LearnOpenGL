@@ -131,8 +131,6 @@ int main() {
   shader.setInt("texture1", 0);
   shader.setInt("texture2", 1);
 
-  unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
-  
   // render loop
   while(!glfwWindowShouldClose(window)) {
     processInput(window);
@@ -144,7 +142,7 @@ int main() {
     trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
     trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+    shader.setMat4("transform", trans);
 
     // shader.use();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
