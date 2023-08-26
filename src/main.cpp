@@ -174,10 +174,11 @@ int main() {
   shader.setInt("texture2", 1);
 
   glm::mat4 view = glm::mat4(1.0f);
-  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+  view = glm::translate(view, glm::vec3(-3.0f, 0.0f, -3.0f));
+  view = glm::rotate(view, glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
   glm::mat4 projection;
-  projection = glm::perspective(glm::radians(30.0f), 100.0f / 200.0f, 0.1f, 100.0f);
+  projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
   shader.setMat4("view", view);
   shader.setMat4("projection", projection);
