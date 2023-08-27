@@ -10,6 +10,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+  glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+  glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 void processInput(GLFWwindow* window);
@@ -193,14 +197,7 @@ int main() {
       model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
       shader.setMat4("model", model);
 
-      const float radius = 10.0f;
-      float camX = sin(glfwGetTime()) * radius;
-      float camZ = cos(glfwGetTime()) * radius;
-
-      glm::mat4 view;
-      view = glm::lookAt(glm::vec3(camX, 0.0f, camZ),
-                         glm::vec3(0.0f, 0.0f, 0.0f),
-                         glm::vec3(0.0f, 1.0f, 0.0f));
+      glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
       shader.setMat4("view", view);
 
       glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -226,4 +223,14 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
+
+  const float cameraSpeed = 0.05f;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    cameraPos += cameraSpeed * cameraFront;
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    cameraPos -= cameraSpeed * cameraFront;
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
