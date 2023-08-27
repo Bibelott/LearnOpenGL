@@ -10,9 +10,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-  glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-  glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -225,12 +225,17 @@ void processInput(GLFWwindow* window) {
     glfwSetWindowShouldClose(window, true);
 
   const float cameraSpeed = 0.05f;
+  glm::vec3 newDir = glm::vec3(0.0f, 0.0f, 0.0f);
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    cameraPos += cameraSpeed * cameraFront;
+    newDir += cameraFront;
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    cameraPos -= cameraSpeed * cameraFront;
+    newDir -= cameraFront;
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    newDir -= glm::normalize(glm::cross(cameraFront, cameraUp));
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    newDir += glm::normalize(glm::cross(cameraFront, cameraUp));
+
+  if (newDir != glm::vec3(0.0f, 0.0f, 0.0f)) {
+    cameraPos += glm::normalize(newDir) * cameraSpeed;
+  }
 }
