@@ -14,6 +14,9 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 void processInput(GLFWwindow* window);
@@ -185,6 +188,8 @@ int main() {
   glEnable(GL_DEPTH_TEST);
   // render loop
   while(!glfwWindowShouldClose(window)) {
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
     processInput(window);
 
     // render
@@ -206,6 +211,7 @@ int main() {
     // end loop
     glfwSwapBuffers(window);
     glfwPollEvents();
+    lastFrame = currentFrame;
   }
 
   glDeleteVertexArrays(1, &VAO);
@@ -224,7 +230,7 @@ void processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
 
-  const float cameraSpeed = 0.05f;
+  const float cameraSpeed = 2.5f;
   glm::vec3 newDir = glm::vec3(0.0f, 0.0f, 0.0f);
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     newDir += cameraFront;
@@ -236,6 +242,6 @@ void processInput(GLFWwindow* window) {
     newDir += glm::normalize(glm::cross(cameraFront, cameraUp));
 
   if (newDir != glm::vec3(0.0f, 0.0f, 0.0f)) {
-    cameraPos += glm::normalize(newDir) * cameraSpeed;
+    cameraPos += glm::normalize(newDir) * cameraSpeed * deltaTime;
   }
 }
