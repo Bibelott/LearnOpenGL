@@ -20,6 +20,7 @@ float lastY = 300;
 bool firstMouse = true;
 
 glm::vec3 lightPos(1.2f, 1.0f, -2.0f);
+float lightRadius = 3.0f;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -189,7 +190,6 @@ int main() {
   cubeShader.use();
   cubeShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
   cubeShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-  cubeShader.setVec3("lightPos", lightPos);
 
   glEnable(GL_DEPTH_TEST);
   // render loop
@@ -215,6 +215,7 @@ int main() {
       cubeShader.setMat4("projection", projection);
 
       cubeShader.setVec3("viewPos", camera.Position);
+      cubeShader.setVec3("lightPos", lightPos);
 
       glBindVertexArray(cubeVAO);
       glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -239,6 +240,8 @@ int main() {
       glDrawArrays(GL_TRIANGLES, 0, 36);
       glBindVertexArray(0);
     }
+
+    lightPos = glm::vec3(sin((float)glfwGetTime()) * lightRadius, 1.0f, cos((float)glfwGetTime()) * lightRadius);
 
     // end loop
     glfwSwapBuffers(window);
