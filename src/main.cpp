@@ -214,6 +214,8 @@ int main() {
       projection = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 100.0f);
       cubeShader.setMat4("projection", projection);
 
+      cubeShader.setVec3("viewPos", camera.Position);
+
       glBindVertexArray(cubeVAO);
       glDrawArrays(GL_TRIANGLES, 0, 36);
       glBindVertexArray(0);
