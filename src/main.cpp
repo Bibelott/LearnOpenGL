@@ -144,10 +144,11 @@ int main() {
   glBindVertexArray(0);
 
   unsigned int diffuseMap = loadTexture("textures/container2.png");
+  unsigned int specularMap = loadTexture("textures/container2_specular.png");
   
   cubeShader.use();
   cubeShader.setInt("material.diffuse", 0);
-  cubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+  cubeShader.setInt("material.specular", 1);
   cubeShader.setFloat("material.shininess", 32.0f);
 
   cubeShader.setVec3("light.position", lightPos);
@@ -157,6 +158,8 @@ int main() {
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, diffuseMap);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, specularMap);
 
   glEnable(GL_DEPTH_TEST);
   // render loop
