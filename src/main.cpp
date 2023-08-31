@@ -163,7 +163,7 @@ int main() {
   cubeShader.setInt("material.specular", 1);
   cubeShader.setFloat("material.shininess", 32.0f);
 
-  cubeShader.setVec3("light.position", lightPos);
+  cubeShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
   cubeShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
   cubeShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
   cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
@@ -198,6 +198,9 @@ int main() {
 
       cubeShader.setVec3("viewPos", camera.Position);
       glBindVertexArray(cubeVAO);
+
+      cubeShader.setVec3("light.position", camera.Position);
+      cubeShader.setVec3("light.direction", camera.Front);
 
       for (unsigned int i = 0; i < 10; i++) {
         glm::mat4 model = glm::mat4(1.0f);
