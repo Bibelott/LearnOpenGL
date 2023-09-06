@@ -8,7 +8,8 @@
 #include <GLFW/glfw3.h>
 #include <shader.hpp>
 
-using namespace std;
+using std::vector;
+using std::string;
 
 struct Vertex {
   glm::vec3 Position;
@@ -19,6 +20,7 @@ struct Vertex {
 struct Texture {
   unsigned int id;
   string type;
+  string path;
 };
 
 class Mesh {
