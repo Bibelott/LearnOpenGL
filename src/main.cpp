@@ -240,6 +240,7 @@ int main()
         // ------
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
         glEnable(GL_BLEND);
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -265,6 +266,7 @@ int main()
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         // floor
+        glDisable(GL_CULL_FACE);
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
         shader.setMat4("model", glm::mat4(1.0f));
