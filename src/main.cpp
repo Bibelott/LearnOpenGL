@@ -86,47 +86,48 @@ int main()
     // ------------------------------------------------------------------
     float cubeVertices[] = {
         // positions          // texture Coords
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        // back face
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left
+         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // top-right
+         0.5f, -0.5f, -0.5f, 1.0f, 0.0f, // bottom-right
+         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // top-right
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left
+        -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, // top-left
+        // front face
+        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // bottom-left
+         0.5f, -0.5f,  0.5f, 1.0f, 0.0f, // bottom-right
+         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, // top-right
+         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, // top-right
+        -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, // top-left
+        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // bottom-left
+        // left face
+        -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // top-right
+        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // top-left
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-left
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-left
+        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // bottom-right
+        -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // top-right
+        // right face
+         0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // top-left
+         0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-right
+         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // top-right
+         0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-right
+         0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // top-left
+         0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // bottom-left
+        // bottom face
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // top-right
+         0.5f, -0.5f, -0.5f, 1.0f, 1.0f, // top-left
+         0.5f, -0.5f,  0.5f, 1.0f, 0.0f, // bottom-left
+         0.5f, -0.5f,  0.5f, 1.0f, 0.0f, // bottom-left
+        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // bottom-right
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // top-right
+        // top face
+        -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, // top-left
+         0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // bottom-right
+         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // top-right
+         0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // bottom-right
+        -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, // top-left
+        -0.5f,  0.5f,  0.5f, 0.0f, 0.0f  // bottom-left
     };
     float planeVertices[] = {
         // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
@@ -177,7 +178,7 @@ int main()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
-    // grass VAO
+    // glass VAO
     unsigned int windowVAO, windowVBO;
     glGenVertexArrays(1, &windowVAO);
     glGenBuffers(1, &windowVBO);
@@ -217,6 +218,7 @@ int main()
 
         // render
         // ------
+        glEnable(GL_CULL_FACE);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -238,12 +240,12 @@ int main()
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         // floor
+        glDisable(GL_CULL_FACE);
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
         shader.setMat4("model", glm::mat4(1.0f));
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // glass
-
         std::map<float, glm::vec3> sorted;
         for (unsigned int i = 0; i < windows.size(); i++) {
             float distance = glm::length(camera.Position - windows[i]);
