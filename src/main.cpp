@@ -44,7 +44,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // stbi_set_flip_vertically_on_load(1);
+    stbi_set_flip_vertically_on_load(1);
 
     // glfw window creation
     // --------------------
@@ -73,22 +73,18 @@ int main()
 
     // configure global opengl state
     // -----------------------------
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // build and compile shaders
     // -------------------------
     Shader shader("src/shader.vert", "src/shader.frag");
-    Shader quadShader("src/quadShader.vert", "src/quadShader.frag");
+    Shader mirrorShader("src/mirrorShader.vert", "src/mirrorShader.frag");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float quadVertices[] = {
-        // positions   // texCoords
-        -1.0f,  1.0f,  0.0f, 1.0f,
-        -1.0f, -1.0f,  0.0f, 0.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-        -1.0f,  1.0f,  0.0f, 1.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-         1.0f,  1.0f,  1.0f, 1.0f
-    };
     float cubeVertices[] = {
         // positions          // texture Coords
         // back face
@@ -144,19 +140,17 @@ int main()
         -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
     };
-    
-    // quad VAO
-    unsigned int quadVAO, quadVBO;
-    glGenVertexArrays(1, &quadVAO);
-    glGenBuffers(1, &quadVBO);
-    glBindVertexArray(quadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-    glBindVertexArray(0);
+    float mirrorVertices[] = {
+        -0.2f,  0.7f, 0.0f, 0.0f,
+         0.2f,  0.7f, 1.0f, 0.0f,
+         0.2f,  1.0f, 1.0f, 1.0f,
+        -0.2f,  1.0f, 0.0f, 1.0f
+    };
+    unsigned int mirrorIndices[] = {
+        0, 1, 3,
+        1, 2, 3
+    };
+
     // cube VAO
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -180,36 +174,39 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    // mirror VAO
+    unsigned int mirrorVAO, mirrorVBO, mirrorEBO;
+    glGenVertexArrays(1, &mirrorVAO);
+    glBindVertexArray(mirrorVAO);
+
+    glGenBuffers(1, &mirrorVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mirrorVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mirrorVertices), &mirrorVertices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &mirrorEBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mirrorEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mirrorIndices), &mirrorIndices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
     glBindVertexArray(0);
+    // other mirror stuff
+    unsigned int fbo, rbo, fbTex;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-    // load textures
-    // -------------
-    unsigned int cubeTexture  = loadTexture("resources/container.jpg");
-    unsigned int floorTexture = loadTexture("resources/metal.png");
-
-    // shader configuration
-    // --------------------
-    shader.use();
-    shader.setInt("texture1", 0);
-    quadShader.use();
-    quadShader.setInt("screenTexture", 0);
-
-    unsigned int framebuffer;
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-    unsigned int texColorBuffer;
-    glGenTextures(1, &texColorBuffer);
-    glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-
+    glGenTextures(1, &fbTex);
+    glBindTexture(GL_TEXTURE_2D, fbTex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbTex, 0);
 
-    unsigned int rbo;
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
@@ -218,9 +215,22 @@ int main()
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "Error: Framebuffer is not complete!\n";
+        std::cerr << "Error: Framebuffer not complete!\n";
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // load textures
+    // -------------
+    unsigned int cubeTexture  = loadTexture("resources/marble.jpg");
+    unsigned int floorTexture = loadTexture("resources/metal.png");
+
+    // shader configuration
+    // --------------------
+    shader.use();
+    shader.setInt("texture1", 0);
+
+    mirrorShader.use();
+    mirrorShader.setInt("mirrorTexture", 0);
 
     // render loop
     // -----------
@@ -238,53 +248,80 @@ int main()
 
         // render
         // ------
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_BLEND);
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+            glEnable(GL_CULL_FACE);
+            glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            shader.use();
+            glm::mat4 model = glm::mat4(1.0f);
+            camera.Yaw   += 180.0f; // rotate the camera's yaw 180 degrees around
+            camera.ProcessMouseMovement(0, 0, false); // call this to make sure it updates its camera vectors, note that we disable pitch constrains for this specific case (otherwise we can't reverse camera's pitch values)
+            glm::mat4 view = camera.GetViewMatrix();
+            camera.Yaw   -= 180.0f; // reset it back to its original orientation
+            camera.ProcessMouseMovement(0, 0, true); 
+            glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+            shader.setMat4("view", view);
+            shader.setMat4("projection", projection);
+            // cubes
+            glBindVertexArray(cubeVAO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, cubeTexture); 	
+            model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+            shader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+            shader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            // floor
+            glDisable(GL_CULL_FACE);
+            glBindVertexArray(planeVAO);
+            glBindTexture(GL_TEXTURE_2D, floorTexture);
+            shader.setMat4("model", glm::mat4(1.0f));
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        
+            glBindVertexArray(0);
+        }
 
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glEnable(GL_CULL_FACE);
+            glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shader.use();
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
-        // cubes
-        glBindVertexArray(cubeVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, cubeTexture); 	
-        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-        shader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-        shader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        // floor
-        glDisable(GL_CULL_FACE);
-        glBindVertexArray(planeVAO);
-        glBindTexture(GL_TEXTURE_2D, floorTexture);
-        shader.setMat4("model", glm::mat4(1.0f));
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+            shader.use();
+            glm::mat4 model = glm::mat4(1.0f);
+            glm::mat4 view = camera.GetViewMatrix();
+            glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+            shader.setMat4("view", view);
+            shader.setMat4("projection", projection);
+            // cubes
+            glBindVertexArray(cubeVAO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, cubeTexture); 	
+            model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+            shader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+            shader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            // floor
+            glDisable(GL_CULL_FACE);
+            glBindVertexArray(planeVAO);
+            glBindTexture(GL_TEXTURE_2D, floorTexture);
+            shader.setMat4("model", glm::mat4(1.0f));
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            // mirror
+            mirrorShader.use();
+            glBindVertexArray(mirrorVAO);
+            glBindTexture(GL_TEXTURE_2D, fbTex);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        glBindVertexArray(0);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        quadShader.use();
-        glBindVertexArray(quadVAO);
-        glDisable(GL_DEPTH_TEST);
-        glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        glBindVertexArray(0);
+            glBindVertexArray(0);
+        }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -296,13 +333,8 @@ int main()
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &cubeVAO);
     glDeleteVertexArrays(1, &planeVAO);
-    glDeleteVertexArrays(1, &quadVAO);
     glDeleteBuffers(1, &cubeVBO);
     glDeleteBuffers(1, &planeVBO);
-    glDeleteBuffers(1, &quadVBO);
-    glDeleteFramebuffers(1, &framebuffer);
-    glDeleteRenderbuffers(1, &rbo);
-    glDeleteTextures(1, &texColorBuffer);
 
     glfwTerminate();
     return 0;
