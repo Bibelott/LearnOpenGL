@@ -1,16 +1,13 @@
 #version 460 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNormal;
 
-out vec3 Normal;
-out vec3 Position;
+layout (location = 0) in vec2 aPos;
+layout (location = 1) in vec3 aColor;
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+out VS_OUT {
+    vec3 color;
+} vs_out;
 
 void main() {
-	Normal = transpose(inverse(mat3(model))) * aNormal;
-	Position = vec3(model * vec4(aPos, 1.0));
-	gl_Position = projection * view * vec4(Position, 1.0f);
-};
+    gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);
+    vs_out.color = aColor;
+}
