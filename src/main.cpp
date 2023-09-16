@@ -89,47 +89,47 @@ int main()
     float cubeVertices[] = {
         // positions          // texture Coords
         // back face
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left
-         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // top-right
-         0.5f, -0.5f, -0.5f, 1.0f, 0.0f, // bottom-right
-         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // top-right
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left
-        -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, // top-left
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // bottom-left
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // top-right
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // bottom-right
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // top-right
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // bottom-left
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // top-left
         // front face
-        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // bottom-left
-         0.5f, -0.5f,  0.5f, 1.0f, 0.0f, // bottom-right
-         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, // top-right
-         0.5f,  0.5f,  0.5f, 1.0f, 1.0f, // top-right
-        -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, // top-left
-        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // bottom-left
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // bottom-left
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // bottom-right
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // top-right
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // top-right
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // top-left
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // bottom-left
         // left face
-        -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // top-right
-        -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // top-left
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-left
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-left
-        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // bottom-right
-        -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // top-right
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, // top-right
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, // top-left
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, // bottom-left
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, // bottom-left
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, // bottom-right
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, // top-right
         // right face
-         0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // top-left
-         0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-right
-         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // top-right
-         0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // bottom-right
-         0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // top-left
-         0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // bottom-left
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, // top-left
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, // bottom-right
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, // top-right
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, // bottom-right
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, // top-left
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, // bottom-left
         // bottom face
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // top-right
-         0.5f, -0.5f, -0.5f, 1.0f, 1.0f, // top-left
-         0.5f, -0.5f,  0.5f, 1.0f, 0.0f, // bottom-left
-         0.5f, -0.5f,  0.5f, 1.0f, 0.0f, // bottom-left
-        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // bottom-right
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // top-right
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, // top-right
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, // top-left
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, // bottom-left
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, // bottom-left
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, // bottom-right
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, // top-right
         // top face
-        -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, // top-left
-         0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // bottom-right
-         0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // top-right
-         0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // bottom-right
-        -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, // top-left
-        -0.5f,  0.5f,  0.5f, 0.0f, 0.0f  // bottom-left
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, // top-left
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, // bottom-right
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, // top-right
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, // bottom-right
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, // top-left
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f  // bottom-left
     };
     float planeVertices[] = {
         // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
@@ -181,14 +181,14 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
 
-    glBindVertexBuffer(0, cubeVBO, 0, 5 * sizeof(float));
+    glBindVertexBuffer(0, cubeVBO, 0, 6 * sizeof(float));
 
     glEnableVertexAttribArray(0);
     glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, 0);
     glVertexAttribBinding(0, 0);
 
     glEnableVertexAttribArray(1);
-    glVertexAttribFormat(1, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(float));
+    glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float));
     glVertexAttribBinding(1, 0);
     
     glBindVertexArray(0);
@@ -247,7 +247,7 @@ int main()
     // shader configuration
     // --------------------
     shader.use();
-    shader.setInt("texture1", 0);
+    shader.setInt("skybox", 0);
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
 
@@ -278,9 +278,10 @@ int main()
         shader.use();
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
+        shader.setVec3("cameraPos", camera.Position);
         // cubes
         glBindVertexArray(cubeVAO);
-        glBindTexture(GL_TEXTURE_2D, cubeTexture); 	
+        glBindTexture(GL_TEXTURE_2D, cubemapTexture); 	
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
