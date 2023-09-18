@@ -74,7 +74,8 @@ int main()
 
     Model backpack("resources/backpack.obj");
 
-    Shader shader("src/shader.vert", "src/shader.geom", "src/shader.frag");
+    Shader shader("src/shader.vert", "src/shader.frag");
+    Shader normalShader("src/normalShader.vert", "src/normalShader.geom", "src/normalShader.frag");
 
     // render loop
     // -----------
@@ -98,8 +99,14 @@ int main()
         shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-        shader.setFloat("time", (float)glfwGetTime());
         
+        backpack.Draw(shader);
+
+        normalShader.use();
+        normalShader.setMat4("model", model);
+        normalShader.setMat4("view", view);
+        normalShader.setMat4("projection", projection);
+
         backpack.Draw(shader);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
