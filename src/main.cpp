@@ -32,6 +32,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_SAMPLES, 4);
 
   GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
 
@@ -61,6 +62,8 @@ int main() {
   // stbi_set_flip_vertically_on_load(1);
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_MULTISAMPLE);
 
   Shader shader("src/shader.vert", "src/shader.frag");
   Shader instanceShader("src/instanceShader.vert", "src/instanceShader.frag");
