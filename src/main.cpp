@@ -16,7 +16,7 @@
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-Camera camera(glm::vec3(0.0f, 20.0f, 200.0f));
+Camera camera(glm::vec3(0.0f, 20.0f, 120.0f));
 float lastX = 400;
 float lastY = 300;
 bool firstMouse = true;
@@ -68,12 +68,12 @@ int main() {
   Model planet("resources/planet.obj");
   Model rock("resources/rock.obj");
 
-  unsigned int amount = 100000;
+  unsigned int amount = 10000;
   glm::mat4 *modelMatrices;
   modelMatrices = new glm::mat4[amount];
   srand(glfwGetTime());
-  float radius = 150.0f;
-  float offset = 25.0f;
+  float radius = 100.0f;
+  float offset = 15.0f;
 
   for (unsigned int i = 0; i < amount; i++) {
     glm::mat4 model = glm::mat4(1.0f);
@@ -100,40 +100,17 @@ int main() {
     modelMatrices[i] = model;
   }
 
-  unsigned int buffer;
-  glGenBuffers(1, &buffer);
-  glBindBuffer(GL_ARRAY_BUFFER, buffer);
-  glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+  unsigned int ssbo;
+  glGenBuffers(1, &ssbo);
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
 
   for (unsigned int i = 0; i < rock.meshes.size(); i++) {
     unsigned int VAO = rock.meshes[i].VAO;
     glBindVertexArray(VAO);
-    std::size_t v4s = sizeof(glm::vec4);
-
-    glBindVertexBuffer(1, buffer, 0, 4 * v4s);
-    glVertexBindingDivisor(1, 1);
-
-    glEnableVertexAttribArray(3);
-    glVertexAttribFormat(3, 4, GL_FLOAT, GL_FALSE, 0);
-    glVertexAttribBinding(3, 1);
-
-    glEnableVertexAttribArray(4);
-    glVertexAttribFormat(4, 4, GL_FLOAT, GL_FALSE, v4s);
-    glVertexAttribBinding(4, 1);
-
-    glEnableVertexAttribArray(5);
-    glVertexAttribFormat(5, 4, GL_FLOAT, GL_FALSE, 2 * v4s);
-    glVertexAttribBinding(5, 1);
-
-    glEnableVertexAttribArray(6);
-    glVertexAttribFormat(6, 4, GL_FLOAT, GL_FALSE, 3 * v4s);
-    glVertexAttribBinding(6, 1);
-
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, ssbo);
     glBindVertexArray(0);
   }
-
-  double timer = 0.0;
-  unsigned int frameCount = 0;
 
   instanceShader.use();
   instanceShader.setInt("texture_diffuse1", 0);
@@ -143,14 +120,6 @@ int main() {
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
 
-    timer += deltaTime;
-    frameCount++;
-    if (timer >= 1.0) {
-      std::cout << frameCount << std::endl;
-      timer = 0.0;
-      frameCount = 0;
-    }
-    
     processInput(window);
 
     // render
