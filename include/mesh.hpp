@@ -61,7 +61,7 @@ class Mesh {
       glBindVertexArray(0);
     }
 
-  private:
+  // private:
     unsigned int VAO, VBO, EBO;
 
     void setupMesh() {

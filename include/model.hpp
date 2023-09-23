@@ -12,6 +12,8 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 
 class Model {
   public:
+    vector<Mesh> meshes;
+    vector<Texture> textures_loaded;
     Model(const char* path) {
       loadModel(path);
     }
@@ -22,9 +24,9 @@ class Model {
     }
 
   private:
-    vector<Mesh> meshes;
+    // vector<Mesh> meshes;
     string directory;
-    vector<Texture> textures_loaded;
+    // vector<Texture> textures_loaded;
 
     void loadModel(string path) {
       Assimp::Importer importer;
