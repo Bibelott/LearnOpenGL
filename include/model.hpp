@@ -12,8 +12,6 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 
 class Model {
   public:
-    vector<Mesh> meshes;
-    vector<Texture> textures_loaded;
     Model(const char* path) {
       loadModel(path);
     }
@@ -24,9 +22,9 @@ class Model {
     }
 
   private:
-    // vector<Mesh> meshes;
+    vector<Mesh> meshes;
     string directory;
-    // vector<Texture> textures_loaded;
+    vector<Texture> textures_loaded;
 
     void loadModel(string path) {
       Assimp::Importer importer;
@@ -126,8 +124,9 @@ class Model {
         if (skip)
           continue;
       
+        bool gamma = type == aiTextureType_DIFFUSE;
         Texture texture;
-        texture.id = TextureFromFile(str.C_Str(), directory);
+        texture.id = TextureFromFile(str.C_Str(), directory, gamma);
         texture.type = typeName;
         texture.path = str.C_Str();
         textures.push_back(texture);
@@ -149,15 +148,22 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
   unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
   if (data) {
       GLenum format = 0;
-      if (nrComponents == 1)
-          format = GL_RED;
-      else if (nrComponents == 3)
-          format = GL_RGB;
-      else if (nrComponents == 4)
-          format = GL_RGBA;
+      GLenum intFormat = 0;
+      if (nrComponents == 1) {
+        format = GL_RED;
+        intFormat = format;
+      }
+      else if (nrComponents == 3) {
+        format = GL_RGB;
+        intFormat = gamma ? GL_SRGB : format;
+      }
+      else if (nrComponents == 4) {
+        format = GL_RGBA;
+        intFormat = gamma ? GL_SRGB_ALPHA : format;
+      }
 
       glBindTexture(GL_TEXTURE_2D, textureID);
-      glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+      glTexImage2D(GL_TEXTURE_2D, 0, intFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
       glGenerateMipmap(GL_TEXTURE_2D);
 
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

@@ -16,7 +16,7 @@
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-Camera camera(glm::vec3(0.0f, 20.0f, 120.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = 400;
 float lastY = 300;
 bool firstMouse = true;
@@ -32,6 +32,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_SAMPLES, 16);
 
   GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
 
@@ -58,85 +59,20 @@ int main() {
 
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-  // stbi_set_flip_vertically_on_load(1);
-
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
+  glEnable(GL_MULTISAMPLE);
+  glEnable(GL_FRAMEBUFFER_SRGB);
 
-  Shader shader("src/shader.vert", "src/shader.frag");
-  Shader instanceShader("src/instanceShader.vert", "src/instanceShader.frag");
+  Model cube("resources/cube/cube.obj");
+  Model quad("resources/quad/quad.obj");
 
-  Model planet("resources/planet.obj");
-  Model rock("resources/rock.obj");
+  Shader shader("src/cubeShader.vert", "src/cubeShader.frag");
 
-  unsigned int amount = 10000;
-  glm::mat4 *modelMatrices;
-  modelMatrices = new glm::mat4[amount];
-  srand(glfwGetTime());
-  float radius = 100.0f;
-  float offset = 15.0f;
-
-  for (unsigned int i = 0; i < amount; i++) {
-    glm::mat4 model = glm::mat4(1.0f);
-
-    float angle = (float)i / (float)amount * 360.0f;
-
-    float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-    float x = sin(angle) * radius + displacement;
-
-    displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-    float y = displacement * 0.4f;
-
-    displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-    float z = cos(angle) * radius + displacement;
-
-    model = glm::translate(model, glm::vec3(x, y, z));
-
-    float scale = (rand() % 20) / 100.0f + 0.05f;
-    model = glm::scale(model, glm::vec3(scale));
-
-    float rotAngle = (rand() % 360);
-    model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-
-    modelMatrices[i] = model;
-  }
-
-  unsigned int ssbo;
-  glGenBuffers(1, &ssbo);
-  glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
-
-  for (unsigned int i = 0; i < rock.meshes.size(); i++) {
-    unsigned int VAO = rock.meshes[i].VAO;
-    glBindVertexArray(VAO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, ssbo);
-    glBindVertexArray(0);
-  }
-
-  instanceShader.use();
-  instanceShader.setInt("texture_diffuse1", 0);
-
-  unsigned int FBO;
-  glCreateFramebuffers(1, &FBO);
-  glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-
-  unsigned int tex;
-  glGenTextures(1, &tex);
-  glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
-  glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, 800, 600, GL_TRUE);
-  glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, tex, 0);
-
-  unsigned int RBO;
-  glCreateRenderbuffers(1, &RBO);
-  glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-  glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, 800, 600);
-  glBindRenderbuffer(GL_RENDERBUFFER, 0);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    std::cerr << "Error: Framebuffer not complete!\n";
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  shader.use();
+  shader.setVec3("light.direction", 10.0f, -10.0f, 3.0f);
+  shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+  shader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+  shader.setVec3("light.specular", 0.8f, 0.8f, 0.8f);
 
   // render loop
   while(!glfwWindowShouldClose(window)) {
@@ -145,44 +81,33 @@ int main() {
 
     processInput(window);
 
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-
-    shader.use();
 
     glm::mat4 view = camera.GetViewMatrix();
-    shader.setMat4("view", view);
 
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 300.0f);
-    shader.setMat4("projection", projection);
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+
+    shader.use();
+    shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    shader.setFloat("material.shininess", 32.0f);
+
+    shader.setMat4("view", view);
+    shader.setMat4("projection", projection);
     shader.setMat4("model", model);
-    planet.Draw(shader);
+    shader.setVec3("viewPos", camera.Position);
 
-    instanceShader.use();
-    instanceShader.setMat4("view", view);
-    instanceShader.setMat4("projection", projection);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, rock.textures_loaded[0].id);
-    for (unsigned int i = 0; i < rock.meshes.size(); i++) {
-      glBindVertexArray(rock.meshes[i].VAO);
-      glDrawElementsInstanced(GL_TRIANGLES, rock.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, amount);
-      glBindVertexArray(0);
-    }
+    cube.Draw(shader);
 
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, 800, 600, 0, 0, 800, 600, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    shader.setFloat("material.shininess", 4.0f);
+    model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(10.0f, 1.0f, 10.0f));
+    shader.setMat4("model", model);
+
+    quad.Draw(shader);
 
     // end loop
     glfwSwapBuffers(window);
