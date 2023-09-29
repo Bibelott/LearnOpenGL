@@ -13,6 +13,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+const unsigned int SHADOW_WIDHT = 1024, SHADOW_HEIGHT = 1024;
+
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
@@ -20,6 +22,7 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = 400;
 float lastY = 300;
 bool firstMouse = true;
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -67,12 +70,34 @@ int main() {
   Model quad("resources/quad/quad.obj");
 
   Shader shader("src/cubeShader.vert", "src/cubeShader.frag");
+  Shader depthShader("src/depthShader.vert", "src/depthShader.frag");
 
   shader.use();
-  shader.setVec3("light.direction", 10.0f, -10.0f, 3.0f);
+  shader.setVec3("light.direction", 2.0f, -4.0f, 1.0f);
   shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
   shader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
   shader.setVec3("light.specular", 0.8f, 0.8f, 0.8f);
+  shader.setInt("shadowMap", 3);
+
+  unsigned int depthMapFBO;
+  glGenFramebuffers(1, &depthMapFBO);
+
+  unsigned int depthMap;
+  glGenTextures(1, &depthMap);
+  glBindTexture(GL_TEXTURE_2D, depthMap);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDHT, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+
+  glDrawBuffer(GL_NONE);
+  glReadBuffer(GL_NONE);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   // render loop
   while(!glfwWindowShouldClose(window)) {
@@ -81,33 +106,72 @@ int main() {
 
     processInput(window);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glm::mat4 lightSpaceMatrix;
+    
+    {
+      glViewport(0, 0, SHADOW_WIDHT, SHADOW_HEIGHT);
+      glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+      glClear(GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 view = camera.GetViewMatrix();
+      glm::mat4 view = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+                                   glm::vec3( 0.0f, 0.0f,  0.0f),
+                                   glm::vec3( 0.0f, 1.0f,  0.0f));
 
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 300.0f);
+      glm::mat4 projection;
+      projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.5f, 20.0f);
 
-    glm::mat4 model = glm::mat4(1.0f);
+      lightSpaceMatrix = projection * view;
 
-    shader.use();
-    shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-    shader.setFloat("material.shininess", 32.0f);
+      glm::mat4 model = glm::mat4(1.0f);
 
-    shader.setMat4("view", view);
-    shader.setMat4("projection", projection);
-    shader.setMat4("model", model);
-    shader.setVec3("viewPos", camera.Position);
+      depthShader.use();
+      depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+      depthShader.setMat4("model", model);
 
-    cube.Draw(shader);
+      cube.Draw(depthShader);
 
-    shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-    shader.setFloat("material.shininess", 4.0f);
-    model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(10.0f, 1.0f, 10.0f));
-    shader.setMat4("model", model);
+      model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+      model = glm::scale(model, glm::vec3(10.0f, 1.0f, 10.0f));
+      depthShader.setMat4("model", model);
 
-    quad.Draw(shader);
+      quad.Draw(depthShader);
+
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+    {
+      glViewport(0, 0, 800, 600);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      glm::mat4 view = camera.GetViewMatrix();
+
+      glm::mat4 projection;
+      projection = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 300.0f);
+
+      glm::mat4 model = glm::mat4(1.0f);
+
+      shader.use();
+      shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+      shader.setFloat("material.shininess", 32.0f);
+
+      shader.setMat4("view", view);
+      shader.setMat4("projection", projection);
+      shader.setMat4("model", model);
+      shader.setVec3("viewPos", camera.Position);
+      shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+      glActiveTexture(GL_TEXTURE3);
+      glBindTexture(GL_TEXTURE_2D, depthMap);
+
+      cube.Draw(shader);
+
+      shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+      shader.setFloat("material.shininess", 4.0f);
+      model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+      model = glm::scale(model, glm::vec3(10.0f, 1.0f, 10.0f));
+      shader.setMat4("model", model);
+
+      quad.Draw(shader);
+    }
 
     // end loop
     glfwSwapBuffers(window);
