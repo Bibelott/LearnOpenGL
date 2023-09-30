@@ -13,7 +13,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-const unsigned int SHADOW_WIDHT = 1024, SHADOW_HEIGHT = 1024;
+const unsigned int SHADOW_WIDHT = 4096, SHADOW_HEIGHT = 4096;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -63,6 +63,7 @@ int main() {
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
   glEnable(GL_MULTISAMPLE);
   glEnable(GL_FRAMEBUFFER_SRGB);
 
@@ -89,8 +90,10 @@ int main() {
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+  float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
   glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
@@ -109,6 +112,8 @@ int main() {
     glm::mat4 lightSpaceMatrix;
     
     {
+      glEnable(GL_CULL_FACE);
+      glCullFace(GL_FRONT);
       glViewport(0, 0, SHADOW_WIDHT, SHADOW_HEIGHT);
       glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
       glClear(GL_DEPTH_BUFFER_BIT);
@@ -139,6 +144,7 @@ int main() {
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     {
+      glCullFace(GL_BACK);
       glViewport(0, 0, 800, 600);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
