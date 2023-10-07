@@ -36,7 +36,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_SAMPLES, 16);
+  // glfwWindowHint(GLFW_SAMPLES, 16);
 
   GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
 
@@ -62,7 +62,7 @@ int main() {
   glfwSetScrollCallback(window, scroll_callback);
 
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_MULTISAMPLE);
+  // glEnable(GL_MULTISAMPLE);
   glEnable(GL_FRAMEBUFFER_SRGB);
 
   unsigned int diffuseMap = loadTexture("resources/bricks2.jpg", true);
@@ -95,7 +95,6 @@ int main() {
     shader.setMat4("view", view);
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians((float)glfwGetTime() * -10.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 1.0f)));
     shader.setMat4("model", model);
     shader.setVec3("viewPos", camera.Position);
     shader.setVec3("lightPos", lightPos);
