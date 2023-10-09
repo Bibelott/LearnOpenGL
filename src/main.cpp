@@ -16,12 +16,12 @@
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-Camera camera(glm::vec3(0.5f, 1.0f, 0.3f));
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = 400;
 float lastY = 300;
 bool firstMouse = true;
 
-glm::vec3 lightPos = glm::vec3(-2.0f, 4.0f, -2.0f);
+glm::vec3 lightPos = glm::vec3(0.5f, 1.0f, 0.3f);
 
 
 void renderQuad();
