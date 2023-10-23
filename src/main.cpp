@@ -29,6 +29,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char *message, const void *userParam);
 unsigned int loadTexture(const char *path, bool gamma = false);
 
 int main() {
@@ -37,6 +38,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   // glfwWindowHint(GLFW_SAMPLES, 16);
+  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
   GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
 
@@ -64,6 +66,15 @@ int main() {
   glEnable(GL_DEPTH_TEST);
   // glEnable(GL_MULTISAMPLE);
   glEnable(GL_FRAMEBUFFER_SRGB);
+
+  int flags;
+  glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+  if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(glDebugOutput, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+  }
 
   unsigned int diffuseMap = loadTexture("resources/bricks2.jpg", true);
   unsigned int normalMap = loadTexture("resources/bricks2_normal.jpg");
@@ -283,4 +294,80 @@ unsigned int loadTexture(char const * path, bool gamma) {
     }
 
     return textureID;
+}
+
+void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char *message, const void *userParam) {
+  std::cout << "-------------------\n" << "Debug message (" << id << "): " << message << std::endl;
+
+  std::cout << "Source: ";
+  switch (source) {
+    case GL_DEBUG_SOURCE_API:
+      std::cout << "API";
+      break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+      std::cout << "Window System";
+      break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER:
+      std::cout << "Shader Compiler";
+      break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY:
+      std::cout << "Third Party";
+      break;
+    case GL_DEBUG_SOURCE_APPLICATION:
+      std::cout << "Application";
+      break;
+    case GL_DEBUG_SOURCE_OTHER:
+      std::cout << "Other";
+      break;
+  }
+  std::cout << std::endl;
+
+  std::cout << "Type: ";
+  switch (type) {
+    case GL_DEBUG_TYPE_ERROR:
+      std::cout << "Error";
+      break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+      std::cout << "Deprecated Behavior";
+      break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+      std::cout << "Undefined Behavior";
+      break;
+    case GL_DEBUG_TYPE_PORTABILITY:
+      std::cout << "Portability";
+      break;
+    case GL_DEBUG_TYPE_PERFORMANCE:
+      std::cout << "Performance";
+      break;
+    case GL_DEBUG_TYPE_MARKER:
+      std::cout << "Marker";
+      break;
+    case GL_DEBUG_TYPE_PUSH_GROUP:
+      std::cout << "Push Group";
+      break;
+    case GL_DEBUG_TYPE_POP_GROUP:
+      std::cout << "Pop Group";
+      break;
+    case GL_DEBUG_TYPE_OTHER:
+      std::cout << "Other";
+      break;
+  }
+  std::cout << std::endl;
+
+  std::cout << "Severity: ";
+  switch (severity) {
+    case GL_DEBUG_SEVERITY_HIGH:
+      std::cout << "High";
+      break;
+    case GL_DEBUG_SEVERITY_MEDIUM:
+      std::cout << "Medium";
+      break;
+    case GL_DEBUG_SEVERITY_LOW:
+      std::cout << "Low";
+      break;
+    case GL_DEBUG_SEVERITY_NOTIFICATION:
+      std::cout << "Notification";
+      break;
+  }
+  std::cout << std::endl << std::endl;
 }
