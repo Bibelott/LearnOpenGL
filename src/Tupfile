@@ -1,6 +1,6 @@
 include_rules
-CFLAGS += -I../include
-CXXFLAGS += -I../include
+CFLAGS += -I../include -I/usr/include/freetype2
+CXXFLAGS += -I../include -I/usr/include/freetype2
 : foreach *.c |> !cc |>
 : foreach *.cpp |> !cxx |>
 
